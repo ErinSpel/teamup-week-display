@@ -1,0 +1,3 @@
+PUBLIC_TEAMUP_CALENDAR_ID="GET ID FROM https://teamup.com/[CALENDAR_ID_HERE]"
+TEAMUP_API_KEY="GET key FROM https://teamup.com/api-keys/request"
+WEATHER_API_KEY="GET key FROM https://www.weatherapi.com/my/"
