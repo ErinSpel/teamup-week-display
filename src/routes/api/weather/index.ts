@@ -1,6 +1,7 @@
 import type { RequestHandler } from '@builder.io/qwik-city';
+import { PlatformCloudflarePages } from '@builder.io/qwik-city/middleware/cloudflare-pages';
 
-export const onGet: RequestHandler = async ({ json, platform, cacheControl }) => {
+export const onGet: RequestHandler<PlatformCloudflarePages> = async ({ json, platform, cacheControl }) => {
 
     // Cache for 4.5 minutes (270 seconds)
     cacheControl({
@@ -11,7 +12,13 @@ export const onGet: RequestHandler = async ({ json, platform, cacheControl }) =>
     });
 
     console.log('Fetching weather data...');
-    const url = `http://api.weatherapi.com/v1/current.json?key=${platform.env.WEATHER_API_KEY}&q=Vackelsang, Sweden&aqi=yes`;
+
+    const apiKey = platform?.env?.WEATHER_API_KEY ?? process.env.WEATHER_API_KEY;
+    if (!apiKey) {
+        json(500, { error: 'Missing WEATHER_API_KEY' });
+        return;
+    }
+    const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=Vackelsang, Sweden&aqi=yes`;
     const response = await fetch(url, {
         headers: {
             'Content-Type': 'application/json',

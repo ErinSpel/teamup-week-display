@@ -19,9 +19,12 @@ export const onGet: RequestHandler<PlatformCloudflarePages> = async ({ cacheCont
 };
 
 export const useCalendarEnv = routeLoader$(({ platform }) => {
+    if (!platform?.env) {
+        throw new Error('Platform environment variables are not available');
+    }
     return {
-        calendarId: platform.env.PUBLIC_TEAMUP_CALENDAR_ID,
-        apiKey: platform.env.TEAMUP_API_KEY,
+        calendarId: platform.env['PUBLIC_TEAMUP_CALENDAR_ID'],
+        apiKey: platform.env['TEAMUP_API_KEY'],
     };
 });
 

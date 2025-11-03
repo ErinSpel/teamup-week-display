@@ -1,9 +1,9 @@
-import { component$, Slot, useStyles$} from '@builder.io/qwik';
+import { component$, Slot, useStyles$ } from '@builder.io/qwik';
 import { routeLoader$ } from '@builder.io/qwik-city';
 import type { RequestHandler } from '@builder.io/qwik-city';
 
 
-export const onGet: RequestHandler = async ({ cacheControl }) => {
+export const onGet: RequestHandler<PlatformCloudflarePages> = async ({ cacheControl }) => {
   // Control caching for this request for best performance and to reduce hosting costs:
   // https://qwik.dev/docs/caching/
   cacheControl({
@@ -14,11 +14,15 @@ export const onGet: RequestHandler = async ({ cacheControl }) => {
   });
 };
 import styles from './styles.css?inline';
+import { PlatformCloudflarePages } from '@builder.io/qwik-city/middleware/cloudflare-pages';
 
 export const useCalendarEnv = routeLoader$(({ platform }) => {
+  if (!platform.env) {
+    throw new Error('Platform environment variables are not available');
+  }
   return {
-    calendarId: platform.env.PUBLIC_TEAMUP_CALENDAR_ID,
-    apiKey: platform.env.TEAMUP_API_KEY,
+    calendarId: platform.env['PUBLIC_TEAMUP_CALENDAR_ID'],
+    apiKey: platform.env['TEAMUP_API_KEY'],
   };
 });
 export const useServerTimeLoader = routeLoader$(() => {

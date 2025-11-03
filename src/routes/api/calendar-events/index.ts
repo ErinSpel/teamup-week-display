@@ -1,10 +1,12 @@
 import type { RequestHandler } from '@builder.io/qwik-city';
+import { PlatformCloudflarePages } from '@builder.io/qwik-city/middleware/cloudflare-pages';
 
-export const onGet: RequestHandler = async ({ query, json, platform, cacheControl }) => {
+export const onGet: RequestHandler<PlatformCloudflarePages> = async ({ query, json, platform, cacheControl }) => {
     const startDate = query.get('startDate');
     const endDate = query.get('endDate');
 
-    if (!platform.env.PUBLIC_TEAMUP_CALENDAR_ID || !platform.env.TEAMUP_API_KEY) {
+
+    if (!platform?.env?.['PUBLIC_TEAMUP_CALENDAR_ID'] || !platform?.env?.['TEAMUP_API_KEY']) {
         json(500, { error: 'Missing calendar configuration' });
         return;
     }
@@ -63,10 +65,12 @@ export const onGet: RequestHandler = async ({ query, json, platform, cacheContro
     }
 
     console.log('Fetching calendar events from Teamup API...');
-    const url = `https://api.teamup.com/${platform.env.PUBLIC_TEAMUP_CALENDAR_ID}/events?startDate=${startDate}&endDate=${endDate}`;
+
+    const url = `https://api.teamup.com/${platform?.env?.['PUBLIC_TEAMUP_CALENDAR_ID']}/events?startDate=${startDate}&endDate=${endDate}`;
     const response = await fetch(url, {
         headers: {
-            'Teamup-Token': platform.env.TEAMUP_API_KEY,
+
+            'Teamup-Token': platform?.env?.['TEAMUP_API_KEY'],
             'Content-Type': 'application/json',
         },
     });
