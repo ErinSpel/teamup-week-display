@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "teamup-week-display",
+	"name": "teamup-display",
 	"main": "./dist/_worker.js",
 	"compatibility_date": "2025-11-01",
 	"compatibility_flags": [
