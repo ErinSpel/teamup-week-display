@@ -1,0 +1,199 @@
+Reset and base styles * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --column-width: calc(100vw / 9);
+  --color-base-0: #1a1a1a;
+  --color-base-1: #242424;
+  --color-base-2: #292929;
+  --color-text-0: #ffffff;
+  --color-text-2: #b2b2b2;
+  --color-text-3: #ffffffb3;
+  --color-border-0: #353535;
+
+  
+  /* --text-on-accent-secondary:#ffffffb3;
+  --text-on-accent-disabled:#ffffff5c;
+  --fill-accent-primary:rgb(62 95 255);
+  --fill-accent-secondary:rgb(59 84 199);
+  --fill-accent-tertiary:rgb(43 67 178);
+  --fill-grey-primary:rgb(63 63 63);
+  --fill-grey-secondary:rgb(41 41 41);
+  --fill-grey-tertiary:rgb(32 32 32);
+  --fill-grey-neutral:rgb(162 162 162);
+  --fill-accent-disabled:#ffffff26;
+  --fill-grey-disabled:#ffffff26;
+  --fill-grey-black:rgb(255 255 255);
+  --fill-success:rgb(24 134 87);
+  --fill-caution:rgb(222 39 23);
+  --fill-attention:rgb(255 161 0);
+  --stroke-divider:rgb(46 46 46);
+  --stroke-card-soft:rgb(45 45 45);
+  --stroke-card-medium:#75757575;
+  --stroke-disabled:#ffffff26;
+  --system-info:rgb(62 95 255);
+  --system-success:rgb(51 204 112);
+  --system-caution:rgb(227 122 48);
+  --system-attention:rgb(255 120 107);
+  --system-critical:rgb(255 120 107) */
+
+}
+
+
+body {
+  background-color: black;
+  color: var(--text-color);
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Dashboard Layout */
+.dashboard {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  display: flex;
+  height: calc(100vh - 1rem);
+  width: calc(100vw - 1rem);
+  margin: 0.5rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+/* Info Column */
+.info-column {
+  width: var(--column-width);
+  background-color: var(--secondary-color);
+  padding: 0.5rem;
+  border-right: 1px solid var(--border-color);
+}
+
+
+
+.current-time {
+  font-size: 1.9rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.current-date {
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+
+.temperature {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.condition {
+  font-size: 0.5rem;
+  color: #ccc;
+}
+
+/* Calendar View */
+.calendar-view {
+  display: flex;
+  /* flex: 1; */
+  overflow: hidden;
+  height: 100vh;
+  /* Ensure it fills the viewport */
+}
+
+
+
+.calendar-column.today {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.column-header {
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.date {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.time-slots {
+  flex: 1;
+  /* Remove overflow-y: auto; */
+  position: relative;
+  height: calc(100vh - 60px);
+  /* Subtract header height if needed */
+  /* 61px is an example, adjust to match your .column-header height */
+}
+
+.time-slot {
+  height: calc((100vh - 60px) / 24);
+  /* 24 slots fit in available space */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5px;
+  position: relative;
+}
+
+.time-slot {
+  position: relative;
+}
+
+.time-label {
+  font-size: 0.1rem;
+  color: #888;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+}
+
+.event-chip {
+  position: absolute;
+  display: flex;
+  min-height: 28px;
+  left: 60px;
+  right: 5px;
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  z-index: 1;
+}
+
+.event-chip {
+  position: absolute;
+}
+
+.current-time-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #ff3b30;
+  z-index: 2;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--primary-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 0px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

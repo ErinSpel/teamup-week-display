@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "teamup-week-display",
+  "short_name": "TeamUp Week Display",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "description": "Displays the upcoming week of a TeamUp calendar"
+}
