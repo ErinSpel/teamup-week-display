@@ -14,7 +14,9 @@
 	"observability": {
 		"enabled": true
 	},
-	"vars": { "PUBLIC_TEAMUP_CALENDAR_ID": "kspjdxwyx9wogyy5a7" }
+	"vars": {
+		"PUBLIC_TEAMUP_CALENDAR_ID": "kspjdxwyx9wogyy5a7"
+	}
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
