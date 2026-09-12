@@ -7,6 +7,24 @@ import { qwikVite } from "@builder.io/qwik/optimizer";
 import { qwikCity } from "@builder.io/qwik-city/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import pkg from "./package.json";
+import { execSync } from "node:child_process";
+
+// Prefer the CI-provided commit SHA (works regardless of who's building);
+// fall back to reading git directly for local dev/builds so the version
+// endpoint reflects something real instead of a static placeholder.
+function resolveBuildVersion(): string {
+  const fromEnv =
+    process.env.WORKERS_CI_COMMIT_SHA || // Cloudflare Workers Builds
+    process.env.CF_PAGES_COMMIT_SHA || // Cloudflare Pages (classic) builds
+    process.env.GITHUB_SHA;
+  if (fromEnv) return fromEnv;
+
+  try {
+    return execSync("git rev-parse HEAD").toString().trim();
+  } catch {
+    return "dev";
+  }
+}
 
 let platform = {};
 
@@ -39,12 +57,9 @@ export default defineConfig(({ command, mode }): UserConfig => {
     },
 
     // Baked in at build time so the running server can report which deploy
-    // it came from (see src/routes/api/version). CF_PAGES_COMMIT_SHA is set
-    // automatically by Cloudflare Pages builds.
+    // it came from (see src/routes/api/version).
     define: {
-      __BUILD_VERSION__: JSON.stringify(
-        process.env.CF_PAGES_COMMIT_SHA || process.env.GITHUB_SHA || "dev",
-      ),
+      __BUILD_VERSION__: JSON.stringify(resolveBuildVersion()),
     },
 
     /**
