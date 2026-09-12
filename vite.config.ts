@@ -38,6 +38,15 @@ export default defineConfig(({ command, mode }): UserConfig => {
       exclude: [],
     },
 
+    // Baked in at build time so the running server can report which deploy
+    // it came from (see src/routes/api/version). CF_PAGES_COMMIT_SHA is set
+    // automatically by Cloudflare Pages builds.
+    define: {
+      __BUILD_VERSION__: JSON.stringify(
+        process.env.CF_PAGES_COMMIT_SHA || process.env.GITHUB_SHA || "dev",
+      ),
+    },
+
     /**
      * This is an advanced setting. It improves the bundling of your server code. To use it, make sure you understand when your consumed packages are dependencies or dev dependencies. (otherwise things will break in production)
      */

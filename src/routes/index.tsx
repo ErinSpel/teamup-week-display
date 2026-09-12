@@ -49,6 +49,32 @@ export default component$(() => {
         return;
     });
 
+    // This tab stays open indefinitely on a TV, so it needs to notice on its
+    // own when a new build has gone live and reload to pick it up.
+    // eslint-disable-next-line qwik/no-use-visible-task
+    useVisibleTask$(({ cleanup }) => {
+        let knownVersion: string | null = null;
+
+        const checkForNewDeploy = async () => {
+            try {
+                const response = await fetch('/api/version', { cache: 'no-store' });
+                if (!response.ok) return;
+                const { version } = await response.json() as { version: string };
+                if (knownVersion === null) {
+                    knownVersion = version;
+                } else if (version !== knownVersion) {
+                    window.location.reload();
+                }
+            } catch {
+                // Network hiccup; just try again next interval.
+            }
+        };
+
+        checkForNewDeploy();
+        const interval = setInterval(checkForNewDeploy, 5 * 60 * 1000);
+        cleanup(() => clearInterval(interval));
+    });
+
     return (
         <div class="p-2 h-[100vh] w-[100vw]">
             <div class="rounded-2xl h-full w-full flex overflow-hidden border-2 border-solid border-[--color-border-0]">
