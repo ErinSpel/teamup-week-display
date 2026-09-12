@@ -18,8 +18,8 @@ const qrItems = [
 ];
 
 export const InfoWidget = component$<InfoWidgetProps>(({ MOTD }) => (
-    <div class="bg-[--color-base-1] rounded-lg shadow p-2 flex flex-col items-center gap-2 max-w-xs mx-auto text-xs m-1">
-        <h2 class="text-xs font-semibold mb-1 flex items-center gap-1 text-[--color-text-0]">
+    <div class="bg-[--color-base-1] rounded-lg shadow p-2 flex flex-col items-center gap-2 max-w-xs mx-auto text-[11px] leading-4 m-1">
+        <h2 class="text-[11px] leading-4 font-semibold mb-1 flex items-center gap-1 text-[--color-text-0]">
             Information
           </h2>
         <div class="flex flex-col gap-2 w-full">

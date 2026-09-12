@@ -18,10 +18,10 @@ export const WeatherWidget = component$(() => {
   });
 
   return (
-    <div class="bg-[--color-base-1] rounded-lg shadow p-1 flex flex-col items-center gap-1 max-w-xs mx-auto text-xs m-1">
+    <div class="bg-[--color-base-1] rounded-lg shadow p-1 flex flex-col items-center gap-1 max-w-xs mx-auto text-[11px] leading-4 m-1">
       {data.value && (
         <>
-          <h2 class="text-xs font-semibold mb-1 flex items-center gap-1 text-[--color-text-0]">
+          <h2 class="text-[11px] leading-4 font-semibold mb-1 flex items-center gap-1 text-[--color-text-0]">
             Weather
           </h2>
           <div class="flex items-center gap-2 w-full justify-center">
@@ -34,14 +34,14 @@ export const WeatherWidget = component$(() => {
               style={{ marginTop: '2px', marginBottom: '2px' }} // Optional: fine-tune vertical alignment
             />
             <div class="flex flex-col items-start justify-center leading-tight">
-              <span class="text-lg font-bold text-[--color-text-0] leading-none">
+              <span class="text-[17px] font-bold text-[--color-text-0] leading-none">
                 {data.value.current.temp_c}°
-                <span class="text-xs font-normal text-[--color-text-2] align-top">C</span>
+                <span class="text-[11px] font-normal text-[--color-text-2] align-top">C</span>
               </span>
-              <span class="text-[10px] text-[--color-text-3]">{data.value.current.temp_f}°F</span>
+              <span class="text-[9px] text-[--color-text-3]">{data.value.current.temp_f}°F</span>
             </div>
           </div>
-          <div class="text-[11px] text-[--color-text-2] text-center w-full">
+          <div class="text-[10px] text-[--color-text-2] text-center w-full">
             {data.value.current.condition.text}
           </div>
         </>

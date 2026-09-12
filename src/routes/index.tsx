@@ -1,6 +1,6 @@
 import { component$, useSignal, useTask$, useVisibleTask$ } from '@builder.io/qwik';
 import { routeLoader$, type DocumentHead, type RequestHandler } from '@builder.io/qwik-city';
-// import { WeatherWidget } from '../components/weather/weather';
+import { WeatherWidget } from '../components/weather/weather';
 import { TimeWidget } from '../components/time/time';
 import { CalendarView } from '../components/calendar/calendar-view';
 import type { PlatformCloudflarePages } from '@builder.io/qwik-city/middleware/cloudflare-pages';
@@ -56,7 +56,7 @@ export default component$(() => {
                     <SpelkollektivetLogo class="m-2 fill-[--color-text-0]" />
                     <TimeWidget time={currentTime.value} />
                     <InfoWidget />
-                    {/* <WeatherWidget /> */}
+                    <WeatherWidget />
                     {/* <BirthdayWidget /> */}
                     <CalendarEmojiKey />
                 </div>

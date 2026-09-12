@@ -10,6 +10,8 @@ interface CalendarColumnProps {
   index: number;
   platform?: PlatformCloudflarePages;
   loading?: boolean; // <-- Add loading prop
+  startHour?: number; // first hour of the grid (default: midnight)
+  endHour?: number; // first hour past the grid's bottom edge (default: 24)
 }
 
 
@@ -108,7 +110,9 @@ export const CalendarColumn = component$<CalendarColumnProps>(({
   isToday,
   currentTimePosition,
   index,
-  loading = false // <-- Default to false
+  loading = false, // <-- Default to false
+  startHour = 0,
+  endHour = 24,
 }) => {
 
   // Split multi-day events into single-day segments for this column
@@ -125,6 +129,71 @@ export const CalendarColumn = component$<CalendarColumnProps>(({
 
   const headerHeight = 50; // px, adjust if your .column-header height changes
 
+  // The grid only covers [startHour, endHour) rather than the full day, so
+  // events get cropped/scaled against that window instead of 24 hours.
+  const windowStartMinutes = startHour * 60;
+  const windowEndMinutes = endHour * 60;
+  const windowMinutes = windowEndMinutes - windowStartMinutes;
+  const hourCount = endHour - startHour;
+
+  // Minimum height in pixels, so short events stay readable
+  const minHeightPx = 30;
+
+  // Precompute every event's rendered position up front so we can figure out,
+  // for each one, the next event anywhere in the day that it could visually
+  // run into (not just ones sharing its column) once its minimum-height floor
+  // is applied.
+  const layout = dayEvents.map(event => {
+    const eventStart = new Date(event.start);
+    const eventEnd = new Date(event.end);
+    const meta = eventMeta[event.id];
+
+    const startMinutes = (eventStart.getHours() * 60) + eventStart.getMinutes();
+    let endMinutes;
+    if (eventEnd.getTime() === dayEnd.getTime()) {
+      endMinutes = 24 * 60;
+    } else {
+      endMinutes = (eventEnd.getHours() * 60) + eventEnd.getMinutes();
+    }
+
+    // Clamp into the visible window in case an event runs outside the hours
+    // the grid was sized for (e.g. a same-day edge case the padding missed).
+    const clampedStart = Math.min(Math.max(startMinutes, windowStartMinutes), windowEndMinutes);
+    const clampedEnd = Math.min(Math.max(endMinutes, windowStartMinutes), windowEndMinutes);
+
+    return {
+      event,
+      startMinutes,
+      top: ((clampedStart - windowStartMinutes) / windowMinutes) * 100,
+      heightPercent: ((clampedEnd - clampedStart) / windowMinutes) * 100,
+      widthPercent: 100 / meta.cols - 1,
+      leftPercent: (meta.col * 100) / meta.cols,
+      cols: meta.cols,
+      maxHeight: undefined as string | undefined,
+    };
+  });
+
+  // A box shrunk to fit a tight gap can end up too short to read at all. Below
+  // this floor, prefer a small, bounded overlap into whatever comes next over
+  // an illegible sliver.
+  const readableMinHeightPx = 20;
+
+  layout.forEach(entry => {
+    const entryRight = entry.leftPercent + entry.widthPercent;
+    let nextTop: number | null = null;
+    layout.forEach(other => {
+      if (other === entry || other.startMinutes <= entry.startMinutes) return;
+      const otherRight = other.leftPercent + other.widthPercent;
+      const horizontalOverlap = Math.min(entryRight, otherRight) - Math.max(entry.leftPercent, other.leftPercent);
+      if (horizontalOverlap > 0 && (nextTop === null || other.top < nextTop)) {
+        nextTop = other.top;
+      }
+    });
+    entry.maxHeight = nextTop !== null
+      ? `max(calc(${Math.max(nextTop - entry.top, 0)}% - 4px), ${readableMinHeightPx}px)`
+      : undefined;
+  });
+
   return (
     <div class={`flex-1 ${index != 6 ? 'border-r-2' : ''} border-solid border-[--color-border-0] flex-col ${isToday ? 'bg-[--color-base-1]' : 'bg-[--color-base-2]'}`}
     // style={index === 0 ? { flex: 2 } : { flex: 1 }}
@@ -135,7 +204,7 @@ export const CalendarColumn = component$<CalendarColumnProps>(({
         <div class="date">
           {isToday ? (
             <>
-              <span class="text-red-400/80">Today</span> <span class="text-[13px]">({formatDate(date).toString()})</span>
+              <span class="text-red-400/80">Today</span> <span class="text-[12px]">({formatDate(date).toString()})</span>
             </>
           ) : (
             formatDate(date)
@@ -143,10 +212,16 @@ export const CalendarColumn = component$<CalendarColumnProps>(({
         </div>
       </div>
       <div class="flex-1 relative h-full" style={{ height: `calc(100vh - ${headerHeight}px)` }}>
-        {/* Render time labels */}
-        {Array.from({ length: 24 }, (_, i) => (
-          <div key={i} class="h-[calc((100%)/24)] p-1 relative border-b-[1px] border-solid border-[--color-border-0]">
-            <div class="text-[8px] text-[--color-text-2] absolute top-[50%] translate-y-[-50%]">{`${i.toString().padStart(2, '0')}:00`}</div>
+        {/* Render time labels. A gridline every hour for 14+ hours reads as a
+        dense ladder competing with the event chips, so only every second hour
+        gets a full line; the rest get a faint tick, still one per hour. */}
+        {Array.from({ length: hourCount }, (_, i) => startHour + i).map(hour => (
+          <div
+            key={hour}
+            class={`p-1 relative border-b-[1px] border-solid ${hour % 2 === 0 ? 'border-[--color-border-0]' : 'border-[#2b2b2b]'}`}
+            style={{ height: `${100 / hourCount}%` }}
+          >
+            <div class="text-[7px] text-[--color-text-2] absolute top-[50%] translate-y-[-50%]">{`${hour.toString().padStart(2, '0')}:00`}</div>
           </div>
         ))}
         {/* Skeletons while loading */}
@@ -171,52 +246,34 @@ export const CalendarColumn = component$<CalendarColumnProps>(({
           </div>
         )}
         {/* Render events absolutely over the .time-slots area */}
-        {!loading && dayEvents.map(event => {
-          const meta = eventMeta[event.id];
-
-          const eventStart = new Date(event.start);
-          const eventEnd = new Date(event.end);
-
-          // Calculate top and height as percentage of the day
-          const startMinutes = (eventStart.getHours() * 60) + eventStart.getMinutes();
-          let endMinutes;
-          if (eventEnd.getTime() === dayEnd.getTime()) {
-            endMinutes = 24 * 60;
-          } else {
-            endMinutes = (eventEnd.getHours() * 60) + eventEnd.getMinutes();
-          }
-          const top = (startMinutes / (24 * 60)) * 100;
-          const heightPercent = ((endMinutes - startMinutes) / (24 * 60)) * 100;
-          const width = `${100 / meta.cols - 1}%`;
-          const left = `${(meta.col * 100) / meta.cols}%`;
-
-          // Minimum height in pixels
-          const minHeightPx = 30;
+        {!loading && layout.map(({ event, top, heightPercent, leftPercent, widthPercent, cols, maxHeight }) => {
+          const width = `${widthPercent}%`;
+          const left = `${leftPercent}%`;
 
           // const emoji = event.subcalendar_id || "";
 
           return (
             <div
               key={event.id}
-              class='absolute min-h-8 text-[--color-text-0] flex items-start justify-start text-left whitespace-normal break-words text-ellipsis overflow-hidden rounded z-[1] mx-[1px] border-[2px] border-white/30 font-semibold'
+              class='absolute text-[--color-text-0] flex items-start justify-start text-left whitespace-normal break-words text-ellipsis overflow-hidden rounded z-[1] mx-[1px] border border-white/15 font-semibold'
               style={{
                 backgroundColor: event.color,
                 width,
                 left,
                 top: `${top}%`,
                 height: `max(${heightPercent}%, ${minHeightPx}px)`,
-                minHeight: `${minHeightPx}px`,
-                fontSize: '0.6rem',
+                maxHeight,
+                fontSize: '8.6px',
               }}
             >
-              <span class="text-[10px] p-[1px] block w-full h-full rounded bg-slate-900/10">
+              <span class="text-[9px] p-[1px] block w-full h-full rounded bg-slate-900/10">
                 {event.emoji && (
                   <span>
                     {event.emoji}
                   </span>
                 )}
                 {event.start && event.end && (
-                  <span class="text-[--color-text-0] text-[8px]">
+                  <span class="text-[--color-text-0] text-[7px]">
                     {`${Intl.DateTimeFormat('en-US', {
                       hour: 'numeric',
                       minute: 'numeric',
@@ -229,8 +286,8 @@ export const CalendarColumn = component$<CalendarColumnProps>(({
                     {` | ${event.title}`}
                   </span>
                 )}
-                {event.who && (
-                  <span class="text-white/80 text-[8px] font-normal">
+                {event.who && cols < 3 && (
+                  <span class="text-white/80 text-[7px] font-normal">
                     {` (${event.who})`}
                   </span>
                 )}

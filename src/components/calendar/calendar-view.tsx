@@ -1,6 +1,6 @@
 import { component$, useSignal, $, useVisibleTask$ } from '@builder.io/qwik';
 import { CalendarColumn } from './calendar-column';
-import { getCurrentTimePosition } from './utils';
+import { getCurrentTimePosition, computeDayWindow, DEFAULT_DAY_WINDOW, LOCATIONS, FALLBACK_COLOR, type DayWindow } from './utils';
 
 interface CalendarViewProps {
   currentTime: Date;
@@ -12,6 +12,9 @@ interface CalendarViewProps {
 export const CalendarView = component$<CalendarViewProps>(({ currentTime }) => {
   const days = useSignal<Date[]>([]);
   const events = useSignal<any[]>([]);
+  // Shared across all 7 columns so every day's grid lines up on the same
+  // hour scale, cropped to the hours this week's events actually span.
+  const dayWindow = useSignal<DayWindow>(DEFAULT_DAY_WINDOW);
 
   const fetchEvents = $(async () => {
     const today = new Date(currentTime);
@@ -34,18 +37,6 @@ export const CalendarView = component$<CalendarViewProps>(({ currentTime }) => {
       console.error('Failed to fetch calendar events');
       return;
     }
-
-    // Emoji mapping for locations
-    const locationEmoji: Record<string, string> = {
-      "13224130": "🏠",
-      "13225724": "📅",
-      "9546911": "🎬",
-      "9546906": "🪩",
-      "13231308": "♟️",
-      "10589925": "🎼",
-      "9546899": "📊",
-      "11510556": "🛋️",
-    };
 
     interface CalendarEvent {
       events: {
@@ -80,39 +71,25 @@ export const CalendarView = component$<CalendarViewProps>(({ currentTime }) => {
 
     const apiResponse: CalendarEvent = await response.json();
 
-    const hashSubcalendarIdToColor = (subcalendar_id: number) => {
-      if (subcalendar_id === 10589925) {
-        return '#542382'; // Default color for subcalendar_id 0
-      }
-      const idString = subcalendar_id.toString();
-      let hash = 0;
-      for (let i = 0; i < idString.length; i++) {
-        hash = idString.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      // Convert hash into a hex color
-      const color =
-        "#" +
-        ((hash >> 24) & 0xff).toString(16).padStart(2, "0") +
-        ((hash >> 16) & 0xff).toString(16).padStart(2, "0") +
-        ((hash >> 8) & 0xff).toString(16).padStart(2, "0");
-      return color;
-    };
-
     if (!Array.isArray(apiResponse.events)) {
       console.error('API response "events" is not an array');
       return;
     }
 
-    events.value = apiResponse.events.map(event => ({
-      id: event.id,
-      title: event.title,
-      start: new Date(event.start_dt),
-      end: new Date(event.end_dt),
-      who: event.who,
-      emoji: locationEmoji[event.subcalendar_id.toString()] || "",
-      subcalendar_id: event.subcalendar_id,
-      color: hashSubcalendarIdToColor(event.subcalendar_id),
-    }));
+    events.value = apiResponse.events.map(event => {
+      const location = LOCATIONS[event.subcalendar_id.toString()];
+      return {
+        id: event.id,
+        title: event.title,
+        start: new Date(event.start_dt),
+        end: new Date(event.end_dt),
+        who: event.who,
+        emoji: location?.emoji ?? "",
+        subcalendar_id: event.subcalendar_id,
+        color: location?.color ?? FALLBACK_COLOR,
+      };
+    });
+    dayWindow.value = computeDayWindow(events.value);
     // console.info(events.value);
 
   });
@@ -142,8 +119,10 @@ export const CalendarView = component$<CalendarViewProps>(({ currentTime }) => {
             return eventStart < dayEnd && eventEnd > dayStart;
           })}
           isToday={index === 0}
-          currentTimePosition={index === 0 ? getCurrentTimePosition() : null}
+          currentTimePosition={index === 0 ? getCurrentTimePosition(dayWindow.value.startHour, dayWindow.value.endHour) : null}
           loading={events.value.length === 0}
+          startHour={dayWindow.value.startHour}
+          endHour={dayWindow.value.endHour}
         />
       ))}
     </div>

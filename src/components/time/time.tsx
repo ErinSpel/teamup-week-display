@@ -7,7 +7,7 @@ interface TimeWidgetProps {
 export const TimeWidget = component$<TimeWidgetProps>(({ time }) => {
   return (
     <div class="time-widget">
-      <div class="text-xl font-bold text-[--color-text-0] text-center">
+      <div class="text-[19px] leading-7 font-bold text-[--color-text-0] text-center">
         {time.toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',
