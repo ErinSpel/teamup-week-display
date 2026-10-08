@@ -131,8 +131,6 @@ export const CalendarColumn = component$<CalendarColumnProps>(({
   const dayEnd = new Date(dayStart);
   dayEnd.setDate(dayEnd.getDate() + 1);
 
-  const headerHeight = 50; // px, adjust if your .column-header height changes
-
   // The grid only covers [startHour, endHour) rather than the full day, so
   // events get cropped/scaled against that window instead of 24 hours.
   const windowStartMinutes = startHour * 60;
@@ -199,7 +197,7 @@ export const CalendarColumn = component$<CalendarColumnProps>(({
   });
 
   return (
-    <div class={`flex-1 ${index != 6 ? 'border-r-2' : ''} border-solid border-[--color-border-0] flex-col ${isToday ? 'bg-[--color-base-1]' : 'bg-[--color-base-2]'}`}
+    <div class={`flex h-full min-h-0 flex-1 flex-col ${index != 6 ? 'border-r-2' : ''} border-solid border-[--color-border-0] ${isToday ? 'bg-[--color-base-1]' : 'bg-[--color-base-2]'}`}
     // style={index === 0 ? { flex: 2 } : { flex: 1 }}
 
     >
@@ -220,23 +218,28 @@ export const CalendarColumn = component$<CalendarColumnProps>(({
         {[
           { label: 'Lunch:', event: lunch },
           { label: 'Dinner:', event: dinner },
-        ].map(({ label, event }) => event ? (
+        ].map(({ label, event }) => (
           <div
             key={label}
-            class="flex h-[30px] min-h-[30px] items-center overflow-hidden rounded border border-white/15 px-1 text-[--color-text-0] text-[8.6px] font-semibold"
-            style={{ backgroundColor: event.color }}
+            class="flex h-[30px] min-h-[30px] items-center overflow-hidden rounded px-1 text-[--color-text-0] text-[8.6px] font-semibold"
+            style={{
+              backgroundColor: event?.color ?? 'transparent',
+              border: event ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid transparent',
+            }}
           >
-            <span class="shrink-0">{label}</span>
-            <span class="mx-1 min-w-0 truncate font-normal">{event.title.replace(/^(Lunch|Dinner):\s*/, '')}</span>
-            <span class="ml-auto shrink-0 text-[7px] font-normal">
-              {Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }).format(event.start)}
-            </span>
+            {event && (
+              <>
+                <span class="shrink-0">{label}</span>
+                <span class="mx-1 min-w-0 truncate font-normal">{event.title.replace(/^(Lunch|Dinner):\s*/, '')}</span>
+                <span class="ml-auto shrink-0 text-[7px] font-normal">
+                  {Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }).format(event.start)}
+                </span>
+              </>
+            )}
           </div>
-        ) : (
-          <div key={label} class="h-[30px] min-h-[30px]" />
         ))}
       </div>
-      <div class="flex-1 relative h-full" style={{ height: `calc(100vh - ${headerHeight}px)` }}>
+      <div class="relative min-h-0 flex-1">
         {/* Render time labels. A gridline every hour for 14+ hours reads as a
         dense ladder competing with the event chips, so only every second hour
         gets a full line; the rest get a faint tick, still one per hour. */}
