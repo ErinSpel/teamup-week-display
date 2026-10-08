@@ -197,7 +197,7 @@ export const CalendarColumn = component$<CalendarColumnProps>(({
   });
 
   return (
-    <div class={`flex h-full min-h-0 flex-1 flex-col ${index != 6 ? 'border-r-2' : ''} border-solid border-[--color-border-0] ${isToday ? 'bg-[--color-base-1]' : 'bg-[--color-base-2]'}`}
+    <div class={`flex h-full min-h-0 min-w-0 flex-1 flex-col ${index != 6 ? 'border-r-2' : ''} border-solid border-[--color-border-0] ${isToday ? 'bg-[--color-base-1]' : 'bg-[--color-base-2]'}`}
     // style={index === 0 ? { flex: 2 } : { flex: 1 }}
 
     >
@@ -214,14 +214,14 @@ export const CalendarColumn = component$<CalendarColumnProps>(({
         </div>
       </div>
       {/* Keep two compact meal slots reserved so every day's event grid starts at the same height. */}
-      <div class="box-border flex h-[74px] shrink-0 flex-col gap-1 border-b-2 border-solid border-[--color-border-0] p-1">
+      <div class="box-border flex shrink-0 flex-col gap-1 border-b-2 border-solid border-[--color-border-0] p-1">
         {[
           { label: 'Lunch:', event: lunch },
           { label: 'Dinner:', event: dinner },
         ].map(({ label, event }) => (
           <div
             key={label}
-            class="flex h-[30px] min-h-[30px] items-center overflow-hidden rounded px-1 text-[--color-text-0] text-[8.6px] font-semibold"
+            class="box-border flex h-[20px] min-h-[10px] w-full min-w-0 max-w-full items-center overflow-hidden rounded px-1 text-[--color-text-0] text-[8.6px] font-semibold whitespace-nowrap text-ellipsis"
             style={{
               backgroundColor: event?.color ?? 'transparent',
               border: event ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid transparent',
