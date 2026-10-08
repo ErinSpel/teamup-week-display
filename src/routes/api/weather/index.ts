@@ -11,7 +11,7 @@ export const onGet: RequestHandler<PlatformCloudflarePages> = async ({ json, pla
         staleWhileRevalidate: 30
     });
 
-    console.log('Fetching weather data...');
+    // console.log('Fetching weather data...');
 
     const apiKey = platform?.env?.WEATHER_API_KEY ?? process.env.WEATHER_API_KEY;
     if (!apiKey) {

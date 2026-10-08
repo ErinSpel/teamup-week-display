@@ -9,7 +9,7 @@ export interface Location {
   label: string;
   color: string;
 }
-
+// The subcalendar_id values are from the Teamup calendar's "subcalendars" list
 export const LOCATIONS: Record<string, Location> = {
   "13224130": { emoji: "🏠", label: "Featured Activity", color: "#59213C" },
   "13225724": { emoji: "📅", label: "Other Activity", color: "#172B4D" },

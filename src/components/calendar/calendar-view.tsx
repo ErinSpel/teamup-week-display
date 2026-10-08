@@ -9,6 +9,10 @@ interface CalendarViewProps {
   };
 }
 
+const MEAL_SUBCALENDAR_ID = 13224130;
+const isMealEvent = (event: { title: string; subcalendar_id: number }) =>
+  event.subcalendar_id === MEAL_SUBCALENDAR_ID && /^(Lunch|Dinner):/.test(event.title);
+
 export const CalendarView = component$<CalendarViewProps>(({ currentTime }) => {
   const days = useSignal<Date[]>([]);
   const events = useSignal<any[]>([]);
@@ -103,28 +107,36 @@ export const CalendarView = component$<CalendarViewProps>(({ currentTime }) => {
 
   return (
     <div class="calendar-view">
-      {days.value.map((day, index) => (
-        <CalendarColumn
-          key={day.toISOString()}
-          date={day}
-          index={index}
-          events={events.value.filter(event => {
+      {days.value.map((day, index) => {
+        const dayStart = new Date(day);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(dayStart);
+        dayEnd.setDate(dayEnd.getDate() + 1);
+        const dayEvents = events.value.filter(event => {
             const eventStart = new Date(event.start);
             const eventEnd = new Date(event.end);
-            // Event overlaps this day if it starts before dayEnd and ends after dayStart
-            const dayStart = new Date(day);
-            dayStart.setHours(0, 0, 0, 0);
-            const dayEnd = new Date(dayStart);
-            dayEnd.setDate(dayEnd.getDate() + 1);
             return eventStart < dayEnd && eventEnd > dayStart;
-          })}
-          isToday={index === 0}
-          currentTimePosition={index === 0 ? getCurrentTimePosition(dayWindow.value.startHour, dayWindow.value.endHour) : null}
-          loading={events.value.length === 0}
-          startHour={dayWindow.value.startHour}
-          endHour={dayWindow.value.endHour}
-        />
-      ))}
+          });
+        const mealEvents = dayEvents.filter(isMealEvent);
+        const lunch = mealEvents.find(event => event.title.startsWith('Lunch:')) ?? null;
+        const dinner = mealEvents.find(event => event.title.startsWith('Dinner:')) ?? null;
+
+        return (
+          <CalendarColumn
+            key={day.toISOString()}
+            date={day}
+            index={index}
+            lunch={lunch}
+            dinner={dinner}
+            events={dayEvents.filter(event => !isMealEvent(event))}
+            isToday={index === 0}
+            currentTimePosition={index === 0 ? getCurrentTimePosition(dayWindow.value.startHour, dayWindow.value.endHour) : null}
+            loading={events.value.length === 0}
+            startHour={dayWindow.value.startHour}
+            endHour={dayWindow.value.endHour}
+          />
+        );
+      })}
     </div>
   );
 });

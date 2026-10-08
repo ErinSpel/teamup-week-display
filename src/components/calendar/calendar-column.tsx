@@ -4,6 +4,8 @@ import type { PlatformCloudflarePages } from '@builder.io/qwik-city/middleware/c
 
 interface CalendarColumnProps {
   date: Date;
+  lunch: { title: string; start: Date; color: string } | null;
+  dinner: { title: string; start: Date; color: string } | null;
   events: any[];
   isToday: boolean;
   currentTimePosition: number | null;
@@ -106,6 +108,8 @@ function splitMultiDayEvents(events: any[], day: Date) {
 
 export const CalendarColumn = component$<CalendarColumnProps>(({
   date,
+  lunch,
+  dinner,
   events,
   isToday,
   currentTimePosition,
@@ -210,6 +214,27 @@ export const CalendarColumn = component$<CalendarColumnProps>(({
             formatDate(date)
           )}
         </div>
+      </div>
+      {/* Keep two compact meal slots reserved so every day's event grid starts at the same height. */}
+      <div class="box-border flex h-[74px] shrink-0 flex-col gap-1 border-b-2 border-solid border-[--color-border-0] p-1">
+        {[
+          { label: 'Lunch:', event: lunch },
+          { label: 'Dinner:', event: dinner },
+        ].map(({ label, event }) => event ? (
+          <div
+            key={label}
+            class="flex h-[30px] min-h-[30px] items-center overflow-hidden rounded border border-white/15 px-1 text-[--color-text-0] text-[8.6px] font-semibold"
+            style={{ backgroundColor: event.color }}
+          >
+            <span class="shrink-0">{label}</span>
+            <span class="mx-1 min-w-0 truncate font-normal">{event.title.replace(/^(Lunch|Dinner):\s*/, '')}</span>
+            <span class="ml-auto shrink-0 text-[7px] font-normal">
+              {Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: false }).format(event.start)}
+            </span>
+          </div>
+        ) : (
+          <div key={label} class="h-[30px] min-h-[30px]" />
+        ))}
       </div>
       <div class="flex-1 relative h-full" style={{ height: `calc(100vh - ${headerHeight}px)` }}>
         {/* Render time labels. A gridline every hour for 14+ hours reads as a

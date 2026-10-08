@@ -64,7 +64,7 @@ export const onGet: RequestHandler<PlatformCloudflarePages> = async ({ query, js
         });
     }
 
-    console.log('Fetching calendar events from Teamup API...');
+    // console.log('Fetching calendar events from Teamup API...');
 
     const url = `https://api.teamup.com/${platform?.env?.['PUBLIC_TEAMUP_CALENDAR_ID']}/events?startDate=${startDate}&endDate=${endDate}`;
     const response = await fetch(url, {
