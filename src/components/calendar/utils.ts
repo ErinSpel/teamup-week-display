@@ -11,14 +11,14 @@ export interface Location {
 }
 // The subcalendar_id values are from the Teamup calendar's "subcalendars" list
 export const LOCATIONS: Record<string, Location> = {
-  "13224130": { emoji: "🏠", label: "Featured Activity", color: "#59213C" },
-  "13225724": { emoji: "📅", label: "Other Activity", color: "#172B4D" },
-  "9546911": { emoji: "🎬", label: "Bertilsson", color: "#024D5C" },
-  "9546906": { emoji: "🪩", label: "Bruinen TV", color: "#445800" },
-  "13231308": { emoji: "♟️", label: "Isengard", color: "#283618" },
-  "10589925": { emoji: "🎼", label: "Johansson", color: "#7F2600" },
-  "9546899": { emoji: "📊", label: "Meeting Room", color: "#5A0000" },
-  "11510556": { emoji: "🛋️", label: "Sirannon TV", color: "#431700" },
+  "13224130": { emoji: "🏠", label: "Featured Activity", color: "#A3148C" },
+  "13225724": { emoji: "📅", label: "Other Activity", color: "#3B2E7E" },
+  "9546911": { emoji: "🎬", label: "Bertilsson", color: "#00796B" },
+  "9546906": { emoji: "🪩", label: "Bruinen TV", color: "#C24E00" },
+  "13231308": { emoji: "♟️", label: "Isengard", color: "#2E7D32" },
+  "10589925": { emoji: "🎼", label: "Johansson", color: "#0866BF" },
+  "9546899": { emoji: "📊", label: "Meeting Room", color: "#B71C1C" },
+  "11510556": { emoji: "🛋️", label: "Sirannon TV", color: "#6A1B9A" },
 };
 // For any subcalendar not in the map above (contrast checked the same way).
 export const FALLBACK_COLOR = "#4b5563";
