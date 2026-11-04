@@ -13,12 +13,12 @@ export interface Location {
 export const LOCATIONS: Record<string, Location> = {
   "13224130": { emoji: "🏠", label: "Featured Activity", color: "#C0306A" },
   "13225724": { emoji: "📅", label: "Other Activity", color: "#1E5A8C" },
-  "9546911": { emoji: "🎬", label: "Bertilsson", color: "#2A7A8C" },
-  "9546906": { emoji: "🪩", label: "Bruinen TV", color: "#5B6B8A" },
+  "9546911": { emoji: "🎬", label: "Bertilsson", color: "#817FD2" },
+  "9546906": { emoji: "🪩", label: "Bruinen TV", color: "#6B94DB" },
   "13231308": { emoji: "♟️", label: "Isengard", color: "#2F6E5E" },
   "10589925": { emoji: "🎼", label: "Johansson", color: "#8A4FA8" },
   "9546899": { emoji: "📊", label: "Meeting Room", color: "#8E2A44" },
-  "11510556": { emoji: "🛋️", label: "Sirannon TV", color: "#4B3A7A" },
+  "11510556": { emoji: "🛋️", label: "Sirannon TV", color: "#573C9F" },
 };
 // For any subcalendar not in the map above (contrast checked the same way).
 export const FALLBACK_COLOR = "#4b5563";
