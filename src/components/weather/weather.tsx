@@ -1,4 +1,5 @@
 import { component$, useSignal, useVisibleTask$ } from '@builder.io/qwik';
+import { Snowfall, snowIntensity } from './snowfall';
 
 export const WeatherWidget = component$(() => {
   const data = useSignal<any>(null);
@@ -44,6 +45,9 @@ export const WeatherWidget = component$(() => {
           <div class="text-[10px] text-[--color-text-2] text-center w-full">
             {data.value.current.condition.text}
           </div>
+          {snowIntensity(data.value.current.condition) && (
+            <Snowfall intensity={snowIntensity(data.value.current.condition)!} />
+          )}
         </>
       )}
     </div>
