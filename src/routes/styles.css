@@ -102,8 +102,9 @@ body {
   display: flex;
   /* flex: 1; */
   overflow: hidden;
-  height: 100vh;
-  /* Ensure it fills the viewport */
+  /* Fill the dashboard, not the whole viewport, or the bottom of the grid
+     runs past the rounded border and gets clipped. */
+  height: 100%;
 }
 
 
