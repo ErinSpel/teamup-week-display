@@ -102,8 +102,9 @@ body {
   display: flex;
   /* flex: 1; */
   overflow: hidden;
-  height: 100vh;
-  /* Ensure it fills the viewport */
+  /* Fill the dashboard, not the whole viewport, or the bottom of the grid
+     runs past the rounded border and gets clipped. */
+  height: 100%;
 }
 
 
@@ -196,4 +197,43 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+/* Snowfall, shown while the weather widget reports snow */
+.snowfall {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.snowflake {
+  position: absolute;
+  top: 0;
+  border-radius: 50%;
+  background: #fff;
+  transform: translate3d(0, -10px, 0);
+  will-change: transform;
+  animation-name: snowfall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: backwards;
+}
+
+/* Each flake falls for the first 70% of its cycle and then waits above
+   the screen, so only two or three are visible at any moment. */
+@keyframes snowfall {
+  0% {
+    transform: translate3d(0, -10px, 0);
+  }
+  70%,
+  100% {
+    transform: translate3d(var(--snow-drift, 0px), calc(100vh + 10px), 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snowfall {
+    display: none;
+  }
 }
